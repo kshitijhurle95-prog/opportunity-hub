@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpportunityHub | Personalized Internships, Hackathons & Competitions</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff2fe',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#1e1b4b'
+            },
+            navy: {
+              900: '#0f172a',
+              800: '#1e293b',
+              700: '#334155'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#f8fafc] text-[#0f172a] min-h-screen flex font-['Plus_Jakarta_Sans',sans-serif]">
+
+  <!-- 1. LEFT SIDEBAR (COLLAPSIBLE, WHITE, CLEAN ICONS) -->
+  <aside id="app-sidebar" class="w-[230px] bg-white border-r border-slate-200/90 h-screen fixed top-0 left-0 z-30 flex flex-col justify-between py-5 px-3 select-none overflow-y-auto">
+    <div>
+      <!-- Brand Logo, Name & Collapse Toggle Button -->
+      <div class="sidebar-logo-container flex items-center justify-between px-2 mb-6">
+        <div class="flex items-center space-x-2.5 cursor-pointer overflow-hidden" onclick="handleLogoClick()">
+          <div class="w-8 h-8 rounded-lg bg-[#4f46e5] flex items-center justify-center text-white shadow-sm shadow-indigo-500/30 flex-shrink-0">
+            <svg width="18" height="18" class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M13 2L3 14h8v8l10-12h-8l3-8z"/>
+            </svg>
+          </div>
+          <span class="sidebar-header-text text-[17px] font-extrabold tracking-tight text-[#0f172a] whitespace-nowrap">OpportunityHub</span>
+        </div>
+
+        <!-- Collapse Toggle Button inside Sidebar -->
+        <button id="btn-sidebar-toggle" onclick="toggleSidebar()" class="w-7 h-7 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition flex-shrink-0" title="Collapse / Expand Sidebar">
+          <svg id="sidebar-arrow-icon" width="16" height="16" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Main Navigation with Small Controlled Icons -->
+      <nav class="space-y-1">
+        <div id="nav-discover" onclick="switchRoute('discover')" class="nav-item active" title="Discover">
+          <svg width="17" height="17" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+          <span class="sidebar-text truncate">Discover</span>
+        </div>
+
+        <div id="nav-applications" onclick="switchRoute('applications')" class="nav-item" title="My Applications">
+          <svg width="17" height="17" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <span class="sidebar-text truncate">My Applications</span>
+        </div>
+
+        <div id="nav-saved" onclick="switchRoute('saved')" class="nav-item" title="Saved">
+          <svg width="17" height="17" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+          </svg>
+          <span class="sidebar-text truncate">Saved</span>
+          <span id="saved-badge" class="ml-auto text-[11px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded-full">0</span>
+        </div>
+
+        <div id="nav-calendar" onclick="switchRoute('calendar')" class="nav-item" title="Calendar">
+          <svg width="17" height="17" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span class="sidebar-text truncate">Calendar</span>
+        </div>
+
+        <div id="nav-autoapply" onclick="switchRoute('autoapply')" class="nav-item" title="Auto Apply">
+          <svg width="17" height="17" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          <span class="sidebar-text truncate">Auto Apply</span>
+        </div>
+
+        <div id="nav-accounts" onclick="switchRoute('accounts')" class="nav-item" title="Connected Accounts">
+          <svg width="17" height="17" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          <span class="sidebar-text truncate">Connected Accounts</span>
+        </div>
+      </nav>
+
+      <!-- Divider -->
+      <div class="my-4 border-t border-slate-100"></div>
+
+      <!-- Sources Section Header -->
+      <div class="px-2 mb-2">
+        <span class="sidebar-text text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sources</span>
+      </div>
+
+      <!-- Sources List -->
+      <div class="space-y-0.5">
+        <div onclick="selectSource('Unstop')" class="source-nav-item" id="src-nav-unstop" title="Unstop">
+          <span class="brand-icon-unstop">un</span>
+          <span class="sidebar-text truncate">Unstop</span>
+        </div>
+
+        <div onclick="selectSource('Devpost')" class="source-nav-item" id="src-nav-devpost" title="Devpost">
+          <span class="brand-icon-devpost">D</span>
+          <span class="sidebar-text truncate">Devpost</span>
+        </div>
+
+        <div onclick="selectSource('Devfolio')" class="source-nav-item" id="src-nav-devfolio" title="Devfolio">
+          <span class="brand-icon-devfolio">d</span>
+          <span class="sidebar-text truncate">Devfolio</span>
+        </div>
+
+        <div onclick="selectSource('Handshake')" class="source-nav-item" id="src-nav-handshake" title="Handshake">
+          <span class="brand-icon-handshake">H</span>
+          <span class="sidebar-text truncate">Handshake</span>
+        </div>
+
+        <div onclick="selectSource('Wellfound')" class="source-nav-item" id="src-nav-wellfound" title="Wellfound (Startup Internships)">
+          <span class="brand-icon-wellfound">W</span>
+          <span class="sidebar-text truncate">Wellfound</span>
+        </div>
+
+        <div onclick="selectSource('Y Combinator')" class="source-nav-item" id="src-nav-ycombinator" title="Y Combinator">
+          <span class="brand-icon-ycombinator">Y</span>
+          <span class="sidebar-text truncate">Y Combinator</span>
+        </div>
+
+        <div onclick="selectSource('Upwork')" class="source-nav-item" id="src-nav-upwork" title="Upwork">
+          <span class="brand-icon-upwork">up</span>
+          <span class="sidebar-text truncate">Upwork</span>
+        </div>
+
+        <div onclick="selectSource('MLH')" class="source-nav-item" id="src-nav-mlh" title="Major League Hacking">
+          <span class="brand-icon-mlh">mlh</span>
+          <span class="sidebar-text truncate">MLH</span>
+        </div>
+
+        <div onclick="selectSource('Internshala')" class="source-nav-item" id="src-nav-internshala" title="Internshala">
+          <span class="brand-icon-internshala">is</span>
+          <span class="sidebar-text truncate">Internshala</span>
+        </div>
+
+        <div onclick="selectSource('Kaggle')" class="source-nav-item" id="src-nav-kaggle" title="Kaggle">
+          <span class="brand-icon-kaggle">k</span>
+          <span class="sidebar-text truncate">Kaggle</span>
+        </div>
+
+        <div onclick="selectSource('HackerEarth')" class="source-nav-item" id="src-nav-hackerearth" title="HackerEarth">
+          <span class="brand-icon-hackerearth">hE</span>
+          <span class="sidebar-text truncate">HackerEarth</span>
+        </div>
+
+        <div onclick="selectSource('LinkedIn')" class="source-nav-item" id="src-nav-linkedin" title="LinkedIn">
+          <span class="brand-icon-linkedin">in</span>
+          <span class="sidebar-text truncate">LinkedIn</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Sidebar Status -->
+    <div class="sidebar-footer px-2 pt-3 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-between">
+      <span>Auto-Apply v2.4</span>
+      <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block flex-shrink-0"></span>
+    </div>
+  </aside>
+
+  <!-- 2. MAIN CONTENT (FULL-WIDTH SPANNING & COLLAPSIBLE MARGIN) -->
+  <main id="app-main" class="ml-[230px] w-[calc(100%-230px)] min-h-screen bg-[#f8fafc] px-8 py-6 flex-1">
+
+    <!-- Top Utility Header Row (Sidebar toggle, AI badges, Notification bell, User avatar) -->
+    <header class="flex items-center justify-between mb-4">
+      <div class="flex items-center space-x-2">
+        <!-- Hamburger Button to Toggle Sidebar -->
+        <button onclick="toggleSidebar()" class="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 transition mr-1" title="Toggle Sidebar Menu">
+          <svg width="18" height="18" class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+
+        <span class="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-[#eff2fe] text-[#4f46e5]">AI</span>
+        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#ecfdf5] text-[#059669] border border-[#d1fae5]">Auto-Apply Engine</span>
+      </div>
+
+      <div class="flex items-center space-x-3.5 relative">
+        <!-- Notification Bell -->
+        <button class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition relative">
+          <svg width="18" height="18" class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          <span class="w-2 h-2 rounded-full bg-rose-500 absolute top-1 right-1.5 ring-2 ring-white"></span>
+        </button>
+
+        <!-- User Avatar (Toggles floating profile dropdown) -->
+        <div onclick="toggleProfileDropdown()" class="w-8 h-8 rounded-full overflow-hidden border border-slate-200 cursor-pointer ring-2 ring-transparent hover:ring-[#4f46e5] transition">
+          <img id="header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Avatar" class="w-full h-full object-cover">
+        </div>
+
+        <!-- 3. FLOATING PROFILE DROPDOWN MENU -->
+        <div id="profile-dropdown" class="profile-dropdown-shadow hidden absolute top-11 right-0 w-64 bg-white border border-slate-200 rounded-2xl p-4 z-50 text-xs text-slate-600 animate-in fade-in zoom-in-95 duration-100">
+          <div class="flex items-center space-x-3 pb-3 mb-3 border-b border-slate-100">
+            <img id="dropdown-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-slate-200">
+            <div class="truncate">
+              <div id="dropdown-name" class="font-bold text-sm text-[#0f172a] truncate">Kshitij Hurle</div>
+              <div id="dropdown-subtitle" class="text-[11px] text-slate-400 truncate">2nd Year CSE (Data Science)</div>
+              <a href="#" onclick="openProfileModal(); return false;" class="text-[11px] font-semibold text-[#4f46e5] hover:underline">View Profile</a>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <a href="#" onclick="openProfileModal(); return false;" class="flex items-center space-x-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700">
+              <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              <span>My Profile</span>
+            </a>
+            <a href="#" onclick="openProfileModal('skills'); return false;" class="flex items-center space-x-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700">
+              <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+              <span>Skills & Preferences</span>
+            </a>
+            <a href="#" onclick="openProfileModal('resume'); return false;" class="flex items-center space-x-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700">
+              <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              <span>Resume & CV</span>
+            </a>
+            <a href="#" onclick="switchRoute('saved'); return false;" class="flex items-center space-x-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700">
+              <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+              <span>Saved Opportunities</span>
+            </a>
+            <a href="#" onclick="switchRoute('applications'); return false;" class="flex items-center space-x-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700">
+              <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Application Tracker</span>
+            </a>
+          </div>
+
+          <div class="my-2 border-t border-slate-100"></div>
+
+          <div class="space-y-1">
+            <a href="#" class="flex items-center space-x-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700">
+              <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              <span>Notification Settings</span>
+            </a>
+            <a href="#" class="flex items-center space-x-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700">
+              <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span>Connected Accounts</span>
+            </a>
+            <a href="#" class="flex items-center space-x-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700">
+              <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>Settings</span>
+            </a>
+          </div>
+
+          <div class="my-2 border-t border-slate-100"></div>
+
+          <a href="#" onclick="alert('Session secured. Authenticated as Kshitij Hurle.'); return false;" class="flex items-center space-x-2.5 px-2 py-1.5 rounded-lg hover:bg-rose-50 text-rose-600 font-medium">
+            <svg width="16" height="16" class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span>Sign out</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main View Section: Discover -->
+    <div id="view-discover">
+      
+      <!-- Hero Greeting & Sync Pill -->
+      <section class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
+        <div>
+          <div id="hero-greeting" class="text-sm font-semibold text-slate-500 mb-1">Good evening, Kshitij 👋</div>
+          <h1 class="text-[38px] font-extrabold text-[#0f172a] tracking-tight leading-tight mb-1">Find your next big thing.</h1>
+          <p class="text-sm text-slate-500 font-normal">Personalized internships, hackathons and competitions from across the web.</p>
+        </div>
+
+        <!-- Sync Pill -->
+        <div class="flex items-center space-x-2 bg-white border border-slate-200/90 shadow-sm rounded-full px-3.5 py-1.5 text-xs text-slate-600 select-none self-start sm:self-auto">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="sync-timestamp" class="font-medium text-slate-600">Last synced 2 mins ago</span>
+          <button onclick="refreshFeeds()" id="btn-sync" class="w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 transition" title="Refresh Live Opportunities">
+            <svg id="sync-icon" width="14" height="14" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- Search Bar -->
+      <div class="w-full bg-white border border-slate-200/90 rounded-2xl shadow-sm h-14 flex items-center px-4 mb-3.5 focus-within:border-[#4f46e5] focus-within:ring-2 focus-within:ring-indigo-100 transition">
+        <svg width="20" height="20" class="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" id="main-search-input" oninput="handleSearch(this.value)" placeholder="Search by role, company, skills, or keywords (e.g. AI, Python, Amazon)..." 
+          class="w-full text-sm text-[#0f172a] placeholder-slate-400 bg-transparent focus:outline-none">
+        <button onclick="triggerSearch()" class="w-9 h-9 rounded-xl bg-[#4f46e5] hover:bg-[#4338ca] text-white flex items-center justify-center shadow-sm shadow-indigo-500/30 transition flex-shrink-0">
+          <svg width="18" height="18" class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Filter Pills Row -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 mb-6 text-xs select-none no-scrollbar">
+        <button onclick="setCategoryFilter('all')" id="pill-all" class="filter-pill active">All</button>
+        <button onclick="setCategoryFilter('internship')" id="pill-internship" class="filter-pill">💼 Internships</button>
+        <button onclick="setCategoryFilter('hackathon')" id="pill-hackathon" class="filter-pill">🚀 Hackathons</button>
+        <button onclick="setCategoryFilter('competition')" id="pill-competition" class="filter-pill">🏆 Competitions</button>
+
+        <div class="h-4 w-[1px] bg-slate-200 mx-1"></div>
+
+        <button onclick="setPlatformFilter('Unstop')" id="pill-unstop" class="filter-pill">
+          <span class="brand-icon-unstop">un</span> Unstop
+        </button>
+        <button onclick="setPlatformFilter('Devpost')" id="pill-devpost" class="filter-pill">
+          <span class="brand-icon-devpost">D</span> Devpost
+        </button>
+        <button onclick="setPlatformFilter('Devfolio')" id="pill-devfolio" class="filter-pill">
+          <span class="brand-icon-devfolio">d</span> Devfolio
+        </button>
+        <button onclick="setPlatformFilter('Handshake')" id="pill-handshake" class="filter-pill">
+          <span class="brand-icon-handshake">H</span> Handshake
+        </button>
+        <button onclick="setPlatformFilter('Wellfound')" id="pill-wellfound" class="filter-pill">
+          <span class="brand-icon-wellfound">W</span> Wellfound
+        </button>
+        <button onclick="setPlatformFilter('Y Combinator')" id="pill-ycombinator" class="filter-pill">
+          <span class="brand-icon-ycombinator">Y</span> Y Combinator
+        </button>
+        <button onclick="setPlatformFilter('Upwork')" id="pill-upwork" class="filter-pill">
+          <span class="brand-icon-upwork">up</span> Upwork
+        </button>
+        <button onclick="setPlatformFilter('MLH')" id="pill-mlh" class="filter-pill">
+          <span class="brand-icon-mlh">mlh</span> MLH
+        </button>
+        <button onclick="setPlatformFilter('Internshala')" id="pill-internshala" class="filter-pill">
+          <span class="brand-icon-internshala">is</span> Internshala
+        </button>
+        <button onclick="setPlatformFilter('Kaggle')" id="pill-kaggle" class="filter-pill">
+          <span class="brand-icon-kaggle">k</span> Kaggle
+        </button>
+        <button onclick="setPlatformFilter('HackerEarth')" id="pill-hackerearth" class="filter-pill">
+          <span class="brand-icon-hackerearth">hE</span> HackerEarth
+        </button>
+        <button onclick="setPlatformFilter('LinkedIn')" id="pill-linkedin" class="filter-pill">
+          <span class="brand-icon-linkedin">in</span> LinkedIn
+        </button>
+      </div>
+
+      <!-- Summary Metric Cards (Row of 4) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        
+        <!-- Metric Card 1: Total Active -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+              <svg width="20" height="20" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Active</div>
+              <div class="flex items-baseline space-x-2">
+                <span id="metric-total" class="text-2xl font-extrabold text-[#0f172a]">29</span>
+                <span class="text-[11px] font-bold text-emerald-600">↑ +12%</span>
+              </div>
+            </div>
+          </div>
+          <svg class="w-14 h-7 text-blue-500" viewBox="0 0 60 25" fill="none">
+            <path d="M0 20 C10 15, 20 23, 30 14 C40 8, 50 18, 60 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Metric Card 2: Internships -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <svg width="20" height="20" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Internships</div>
+              <div class="flex items-baseline space-x-2">
+                <span id="metric-internships" class="text-2xl font-extrabold text-[#0f172a]">13</span>
+                <span class="text-[11px] font-bold text-emerald-600">↑ +25%</span>
+              </div>
+            </div>
+          </div>
+          <svg class="w-14 h-7 text-emerald-500" viewBox="0 0 60 25" fill="none">
+            <path d="M0 22 C12 20, 22 10, 32 15 C42 12, 50 16, 60 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Metric Card 3: Hackathons -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+              <svg width="20" height="20" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Hackathons</div>
+              <div class="flex items-baseline space-x-2">
+                <span id="metric-hackathons" class="text-2xl font-extrabold text-[#0f172a]">11</span>
+                <span class="text-[11px] font-bold text-emerald-600">↑ +18%</span>
+              </div>
+            </div>
+          </div>
+          <svg class="w-14 h-7 text-purple-500" viewBox="0 0 60 25" fill="none">
+            <path d="M0 18 C15 24, 25 15, 35 17 C45 14, 52 19, 60 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Metric Card 4: Competitions -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+              <svg width="20" height="20" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Competitions</div>
+              <div class="flex items-baseline space-x-2">
+                <span id="metric-competitions" class="text-2xl font-extrabold text-[#0f172a]">5</span>
+                <span class="text-[11px] font-bold text-emerald-600">↑ +0%</span>
+              </div>
+            </div>
+          </div>
+          <svg class="w-14 h-7 text-amber-500" viewBox="0 0 60 25" fill="none">
+            <path d="M0 24 C10 18, 25 16, 35 15 C45 17, 52 12, 60 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+      </div>
+
+      <!-- Daily Opportunity Briefing Banner (Lavender Card with Floating Badges) -->
+      <div class="bg-[#eff2fe] border border-[#e0e7ff] rounded-2xl p-6 mb-7 relative overflow-hidden flex flex-col md:flex-row items-center justify-between">
+        
+        <!-- Left Column -->
+        <div class="max-w-xl z-10">
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-[#4f46e5] flex-shrink-0">
+              <svg width="20" height="20" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/>
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-[#0f172a]">Your daily opportunity briefing</h2>
+          </div>
+          <p class="text-xs text-slate-600 mb-4 pl-12 font-normal">Curated using your skills, interests and application history.</p>
+
+          <!-- Status Pills -->
+          <div class="flex flex-wrap items-center gap-2 pl-12 mb-4 text-xs font-semibold">
+            <span class="bg-white/95 px-3 py-1 rounded-full text-slate-700 shadow-sm flex items-center space-x-1.5 border border-indigo-100">
+              <span class="text-emerald-500">✓</span> <span>24 new opportunities</span>
+            </span>
+            <span class="bg-white/95 px-3 py-1 rounded-full text-slate-700 shadow-sm flex items-center space-x-1.5 border border-indigo-100">
+              <span class="text-emerald-500">✓</span> <span>8 closing soon</span>
+            </span>
+            <span class="bg-white/95 px-3 py-1 rounded-full text-slate-700 shadow-sm flex items-center space-x-1.5 border border-indigo-100">
+              <span class="text-emerald-500">✓</span> <span>5 high match (80%+)</span>
+            </span>
+          </div>
+
+          <div class="pl-12">
+            <button onclick="setCategoryFilter('all')" class="bg-[#4f46e5] hover:bg-[#4338ca] text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-indigo-500/25 transition">
+              View all →
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column Illustration Area with Floating Badges -->
+        <div class="relative w-80 h-44 hidden md:flex items-center justify-center select-none">
+          <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-xl relative z-10 ring-4 ring-indigo-100/50">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Student Profile" class="w-full h-full object-cover">
+          </div>
+
+          <div class="absolute top-3 right-6 bg-white/95 border border-indigo-100 px-3 py-1 rounded-full text-[11px] font-bold text-slate-700 shadow-sm flex items-center space-x-1.5">
+            <span>💼</span> <span>Internships</span>
+          </div>
+          <div class="absolute bottom-6 right-2 bg-white/95 border border-indigo-100 px-3 py-1 rounded-full text-[11px] font-bold text-slate-700 shadow-sm flex items-center space-x-1.5">
+            <span>🏆</span> <span>Competitions</span>
+          </div>
+          <div class="absolute bottom-7 left-3 bg-white/95 border border-indigo-100 px-3 py-1 rounded-full text-[11px] font-bold text-slate-700 shadow-sm flex items-center space-x-1.5">
+            <span>🚀</span> <span>Hackathons</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Top Opportunities Section Header -->
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-[#0f172a]">Top opportunities for you</h2>
+          <p class="text-xs text-slate-500">Based on your profile, skills and recent activity</p>
+        </div>
+
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="text-slate-400 font-medium">Sort by:</span>
+          <select id="sort-selector" onchange="handleSortChange(this.value)" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-slate-700 font-semibold focus:outline-none focus:border-[#4f46e5]">
+            <option value="default">Default (Recommended)</option>
+            <option value="match">Highest Match</option>
+            <option value="deadline">Deadline Soon</option>
+            <option value="newest">Recently Added</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Opportunities 3-Column Grid -->
+      <div id="opportunities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+      <!-- Error / Recovery Banner (Hidden by default, shown only on genuine failure) -->
+      <div id="error-recovery-banner" class="hidden bg-[#fef2f2] border border-[#fecaca] rounded-2xl p-4 flex items-center justify-between shadow-sm transition">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0">
+            <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <div>
+            <div id="error-title" class="text-xs font-bold text-rose-800">We couldn't refresh opportunities</div>
+            <div id="error-desc" class="text-[11px] text-rose-600">Check your connection or try syncing again.</div>
+          </div>
+        </div>
+        <button onclick="refreshFeeds()" class="bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 font-semibold px-3.5 py-1.5 rounded-xl text-xs flex items-center space-x-1.5 transition">
+          <svg width="14" height="14" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Retry</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Secondary View: My Applications Tracker -->
+    <div id="view-applications" class="hidden">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-xl font-bold text-[#0f172a]">My Applications Pipeline</h2>
+            <p class="text-xs text-slate-500">Track and manage every auto-applied opportunity in real time.</p>
+          </div>
+          <button onclick="clearHistory()" class="text-xs text-rose-600 hover:underline font-semibold">Clear History</button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-600">
+            <thead class="bg-slate-50 text-[11px] font-bold uppercase text-slate-400 border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Opportunity</th>
+                <th class="py-3 px-4">Platform</th>
+                <th class="py-3 px-4">Category</th>
+                <th class="py-3 px-4">Applied Date</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="applications-table-body" class="divide-y divide-slate-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary View: Saved Opportunities -->
+    <div id="view-saved" class="hidden">
+      <div class="mb-5">
+        <h2 class="text-xl font-bold text-[#0f172a]">Saved Opportunities</h2>
+        <p class="text-xs text-slate-500">Your bookmarked internships, hackathons, and competitions.</p>
+      </div>
+      <div id="saved-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL 1: FULL OPPORTUNITY DETAIL & AUTO-APPLY DRAWER (WITH DIRECT WEBSITE LINK) -->
+  <div id="modal-details" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
+      <button onclick="closeDetailsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 p-2 rounded-xl hover:bg-slate-100 transition">
+        <svg width="20" height="20" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="flex items-start gap-4 mb-5">
+        <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 p-2 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+          <img id="modal-org-logo" src="" alt="Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex-1 pr-6 truncate">
+          <div class="flex items-center gap-2 mb-1">
+            <span id="modal-cat-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"></span>
+            <span id="modal-deadline-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"></span>
+          </div>
+          <h2 id="modal-title" class="text-xl font-extrabold text-[#0f172a] leading-snug truncate"></h2>
+          <div class="flex items-center space-x-2 text-xs font-semibold text-slate-500 mt-0.5">
+            <span id="modal-org-loc"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Details Grid -->
+      <div class="grid grid-cols-3 gap-3 bg-slate-50 border border-slate-100 rounded-2xl p-3.5 mb-5 text-xs">
+        <div>
+          <div class="text-slate-400">Location</div>
+          <div id="modal-location" class="font-bold text-[#0f172a] mt-0.5"></div>
+        </div>
+        <div>
+          <div class="text-slate-400">Prize / Stipend</div>
+          <div id="modal-prize" class="font-bold text-emerald-600 mt-0.5"></div>
+        </div>
+        <div>
+          <div class="text-slate-400">Match Score</div>
+          <div id="modal-match" class="font-bold text-[#4f46e5] mt-0.5"></div>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Scope & Overview</h3>
+        <p id="modal-desc" class="text-xs text-slate-600 leading-relaxed"></p>
+      </div>
+
+      <div class="mb-5">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Required Skills / Themes</h3>
+        <div id="modal-skills" class="flex flex-wrap gap-1.5"></div>
+      </div>
+
+      <!-- Auto-Apply Injector Box -->
+      <div class="bg-[#ecfdf5] border border-[#d1fae5] rounded-2xl p-4 mb-5">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</span>
+            <span class="text-xs font-bold text-emerald-900">Applicant Information Ready to Inject</span>
+          </div>
+          <span class="text-[11px] text-emerald-700 font-semibold">1-Click Auto-Fill</span>
+        </div>
+        <div id="modal-autofill-preview" class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 bg-white/80 p-2.5 rounded-xl border border-emerald-100">
+          <!-- Populated from user profile -->
+        </div>
+      </div>
+
+      <!-- Modal Action Buttons (Including Direct Website Redirect Option) -->
+      <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
+        <!-- 1. Primary Auto-Fill & Open Button -->
+        <button id="modal-btn-apply" onclick="triggerAutoApply()" class="flex-1 w-full py-3 px-4 rounded-xl bg-[#4f46e5] hover:bg-[#4338ca] font-bold text-white text-xs flex items-center justify-center space-x-2 shadow-md shadow-indigo-500/25 transition">
+          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h8v8l10-12h-8l3-8z"/></svg>
+          <span>⚡ Auto-Fill & Open Application</span>
+        </button>
+
+        <!-- 2. Direct Website Redirect Button (Opens exact opportunity page on Unstop/Devpost/etc) -->
+        <a id="modal-btn-direct" href="#" target="_blank" class="w-full sm:w-auto py-3 px-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-[#0f172a] text-xs font-bold transition flex items-center justify-center space-x-2 shadow-sm">
+          <span id="modal-direct-icon" class="brand-icon-unstop">un</span>
+          <span id="modal-direct-text">Open on Unstop</span>
+          <svg width="14" height="14" class="text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+        </a>
+
+        <!-- 3. Bookmarklet Script Helper -->
+        <button onclick="copyBookmarklet()" class="w-full sm:w-auto py-3 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition" title="Copy 1-Click Bookmarklet">
+          📋 Bookmarklet
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 2: USER PROFILE & PREFERENCES SETTINGS (EXPANDED & COMPREHENSIVE) -->
+  <div id="modal-profile" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-8 relative">
+      <button onclick="closeProfileModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-800 p-2 rounded-xl hover:bg-slate-100 transition">
+        <svg width="20" height="20" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="flex items-center space-x-3 mb-2">
+        <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center flex-shrink-0 shadow-sm">
+          <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-[#0f172a]">Resume & Applicant Profile</h2>
+          <p class="text-xs text-slate-500">Comprehensive credentials used by the 1-Click Auto-Apply engine to fill forms across all opportunity portals.</p>
+        </div>
+      </div>
+
+      <form id="profile-form" onsubmit="saveProfile(event)" class="space-y-6 text-xs mt-5">
+        
+        <!-- SECTION 1: Personal Details & Contact -->
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+          <div class="flex items-center space-x-2 mb-3.5">
+            <span class="text-base">👤</span>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Personal & Contact Information</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Full Legal Name *</label>
+              <input type="text" id="prof-name" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" required>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Professional Title / Headline</label>
+              <input type="text" id="prof-subtitle" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="e.g. 2nd Year CSE | Aspiring SDE">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Current Location (City, Country)</label>
+              <input type="text" id="prof-location" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="e.g. Pune, India">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Email Address *</label>
+              <input type="email" id="prof-email" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" required>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Phone Number (with Country Code)</label>
+              <input type="text" id="prof-phone" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="+91 98765 43210">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Work Authorization / Visa Status</label>
+              <input type="text" id="prof-workauth" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="e.g. Citizen / Eligible for US/India">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Academic Background & Education -->
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+          <div class="flex items-center space-x-2 mb-3.5">
+            <span class="text-base">🎓</span>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Academic Background & Education</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3.5">
+            <div class="md:col-span-2">
+              <label class="block font-semibold text-slate-700 mb-1">College / University Name</label>
+              <input type="text" id="prof-university" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="e.g. Pune Institute of Computer Technology">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Degree & Major</label>
+              <input type="text" id="prof-degree" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="e.g. B.Tech Computer Science">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Graduation Year</label>
+              <input type="text" id="prof-gradyear" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="e.g. 2026">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block font-semibold text-slate-700 mb-1">Current CGPA / GPA / Percentage</label>
+              <input type="text" id="prof-gpa" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="e.g. 8.9 / 10.0">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block font-semibold text-slate-700 mb-1">Relevant Coursework</label>
+              <input type="text" id="prof-coursework" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="e.g. Data Structures, OS, DBMS, Deep Learning">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Career Preferences & Target Roles -->
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+          <div class="flex items-center space-x-2 mb-3.5">
+            <span class="text-base">💼</span>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Career Preferences & Target Opportunities</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Target Roles (comma separated)</label>
+              <input type="text" id="prof-roles" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="Software Engineer Intern, AI/ML Intern">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Preferred Work Mode</label>
+              <select id="prof-workmode" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none">
+                <option value="Remote / Hybrid">Remote / Hybrid (Preferred)</option>
+                <option value="Remote Only">Remote Only</option>
+                <option value="On-site / Hybrid">On-site / Hybrid</option>
+                <option value="Any Location">Any Location / Open to Relocation</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Availability / Notice Period</label>
+              <input type="text" id="prof-availability" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="Immediate (Summer 2026)">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Expected Stipend / Rate</label>
+              <input type="text" id="prof-stipend" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="e.g. ₹50,000 / month or $35/hr">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block font-semibold text-slate-700 mb-1">Target Opportunity Types</label>
+              <input type="text" id="prof-opptypes" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="Internships, Hackathons, Competitions, Freelance">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: Online Profiles & Portfolios -->
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+          <div class="flex items-center space-x-2 mb-3.5">
+            <span class="text-base">🌐</span>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Online Profiles & Coding Links</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">LinkedIn Profile URL</label>
+              <input type="url" id="prof-linkedin" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="https://linkedin.com/in/username">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">GitHub Profile URL</label>
+              <input type="url" id="prof-github" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="https://github.com/username">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Portfolio Website URL</label>
+              <input type="url" id="prof-portfolio" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="https://yourportfolio.dev">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">LeetCode / Coding Profile URL</label>
+              <input type="url" id="prof-leetcode" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="https://leetcode.com/u/username">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 5: Skills & Domain Expertise -->
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+          <div class="flex items-center space-x-2 mb-3.5">
+            <span class="text-base">⚡</span>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Skills & Tech Stack</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <div class="md:col-span-2">
+              <label class="block font-semibold text-slate-700 mb-1">Target Skills & Frameworks (comma separated) *</label>
+              <input type="text" id="prof-skills" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="Python, React, TypeScript, APIs, PyTorch, Docker, SQL" required>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Primary Tech Domain</label>
+              <select id="prof-domain" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none">
+                <option value="Full Stack & AI Systems">Full Stack & AI Systems</option>
+                <option value="Machine Learning / AI">Machine Learning / AI</option>
+                <option value="Frontend Engineering">Frontend Engineering</option>
+                <option value="Backend & Cloud Infrastructure">Backend & Cloud Infrastructure</option>
+                <option value="Data Science & Analytics">Data Science & Analytics</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 6: Resume Document & Auto-Fill Pitch -->
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+          <div class="flex items-center space-x-2 mb-3.5">
+            <span class="text-base">📄</span>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Resume Document & Auto-Fill Pitch</h3>
+          </div>
+          <div class="space-y-3.5">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Local Resume File Path (PDF)</label>
+              <div class="flex gap-2">
+                <input type="text" id="prof-resumepath" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none" placeholder="C:\Users\HP\Documents\Resume_Kshitij_Hurle.pdf">
+                <label class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer font-semibold flex items-center space-x-1.5 transition">
+                  <span>Browse</span>
+                  <input type="file" accept=".pdf" class="hidden" onchange="handleResumeFileSelect(this)">
+                </label>
+              </div>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Elevator Pitch / Cover Letter Bio (Auto-injected into application notes)</label>
+              <textarea id="prof-summary" rows="3" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[#0f172a] focus:border-[#4f46e5] focus:outline-none resize-none" placeholder="2nd Year Computer Science student passionate about machine learning, backend engineering, and autonomous AI systems. Built scalable full-stack applications and hackathon winners."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-slate-400 text-[11px]">All credentials encrypted and stored locally in your OpportunityHub environment.</span>
+          <div class="flex space-x-2.5">
+            <button type="button" onclick="closeProfileModal()" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition">Cancel</button>
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-[#4f46e5] hover:bg-[#4338ca] text-white font-bold shadow-md shadow-indigo-500/25 transition flex items-center space-x-1.5">
+              <span>Save Complete Profile</span>
+              <span>✓</span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-[#0f172a] text-white px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-xs border border-slate-800">
+    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="toast-msg">Action completed!</span>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    (function() {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('modal') === 'profile') {
+        const m = document.getElementById('modal-profile');
+        if (m) m.classList.remove('hidden');
+      } else if (p.get('modal') === 'details') {
+        const m = document.getElementById('modal-details');
+        if (m) m.classList.remove('hidden');
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+{
+  "name": "Opportunity Tracker & Auto-Apply Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger-1",
+      "name": "Daily Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.kaggle.com/api/v1/competitions/list",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-kaggle-1",
+      "name": "Fetch Kaggle Competitions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 120],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const raw = item.json;\n  const competitions = Array.isArray(raw) ? raw : (raw.competitions || [raw]);\n  \n  for (const comp of competitions) {\n    if (!comp.id && !comp.ref) continue;\n    results.push({\n      json: {\n        id: `kaggle_${comp.id || comp.ref}`,\n        source: 'Kaggle',\n        title: comp.title || 'Kaggle Competition',\n        organization: comp.organizationName || 'Kaggle',\n        location: 'Remote / Global',\n        skills: ['Machine Learning', 'Data Science', 'Python', 'AI'],\n        postedDate: comp.enabledDate || new Date().toISOString(),\n        deadline: comp.deadline || null,\n        applyLink: comp.url || `https://www.kaggle.com/competitions/${comp.ref}`,\n        detailsURL: comp.url || `https://www.kaggle.com/competitions/${comp.ref}`,\n        type: 'competition',\n        canAutoApply: false\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "code-normalize-kaggle",
+      "name": "Normalize Kaggle Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 120]
+    },
+    {
+      "parameters": {
+        "url": "https://devpost.com/api/hackathons",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-devpost-1",
+      "name": "Fetch Devpost Hackathons",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const raw = item.json;\n  const hackathons = raw.hackathons || (Array.isArray(raw) ? raw : [raw]);\n\n  for (const h of hackathons) {\n    if (!h.id && !h.title) continue;\n    const themes = (h.themes || []).map(t => typeof t === 'string' ? t : (t.name || t.toString()));\n    results.push({\n      json: {\n        id: `devpost_${h.id}`,\n        source: 'Devpost',\n        title: h.title,\n        organization: h.organization_name || 'Devpost Partner',\n        location: h.displayed_location?.location || 'Online',\n        skills: themes.length ? themes : ['Hackathon', 'AI', 'Coding'],\n        postedDate: new Date().toISOString(),\n        deadline: h.submission_period_dates || null,\n        applyLink: h.url,\n        detailsURL: h.url,\n        type: 'hackathon',\n        canAutoApply: false\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "code-normalize-devpost",
+      "name": "Normalize Devpost Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.hackerearth.com/api/events/upcoming/",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-hackerearth-1",
+      "name": "Fetch HackerEarth Events",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 480],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const raw = item.json;\n  const events = raw.response || (Array.isArray(raw) ? raw : [raw]);\n\n  for (const e of events) {\n    if (!e.title) continue;\n    const rawId = (e.title || '').replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase();\n    results.push({\n      json: {\n        id: `hackerearth_${rawId}`,\n        source: 'HackerEarth',\n        title: e.title,\n        organization: e.is_hackerearth ? 'HackerEarth' : 'HackerEarth Partner',\n        location: 'Online',\n        skills: ['Coding', 'Algorithms', 'Hackathon', 'AI', 'Machine Learning'],\n        postedDate: e.start_utc_tz || new Date().toISOString(),\n        deadline: e.end_tz || e.end_date || null,\n        applyLink: e.url,\n        detailsURL: e.url,\n        type: 'challenge',\n        canAutoApply: false\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "code-normalize-hackerearth",
+      "name": "Normalize HackerEarth Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 480]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "multiplex"
+      },
+      "id": "merge-sources-1",
+      "name": "Merge Sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [980, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const targetSkills = ['python', 'ml', 'ai', 'machine learning', 'hackathon', 'data science', 'backend', 'fullstack', 'pytorch', 'coding'];\nconst now = new Date();\n\nconst items = $input.all();\nconst filtered = [];\n\nfor (const item of items) {\n  const data = item.json;\n  if (!data || !data.id) continue;\n\n  // Check Skill Match\n  const haystack = `${data.title} ${data.organization || ''} ${(data.skills || []).join(' ')}`.toLowerCase();\n  const matchedSkill = targetSkills.find(skill => haystack.includes(skill));\n\n  if (matchedSkill) {\n    filtered.push({\n      json: {\n        ...data,\n        matchedKeyword: matchedSkill\n      }\n    });\n  }\n}\n\nreturn filtered;"
+      },
+      "id": "code-filter-skills",
+      "name": "Filter by Skills & Deadlines",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.seenIds = staticData.seenIds || [];\n\nconst items = $input.all();\nconst newItems = [];\nconst seenSet = new Set(staticData.seenIds);\n\nfor (const item of items) {\n  const id = item.json.id;\n  if (id && !seenSet.has(id)) {\n    seenSet.add(id);\n    newItems.push(item);\n  }\n}\n\nconst updatedList = Array.from(seenSet);\nif (updatedList.length > 2000) {\n  staticData.seenIds = updatedList.slice(updatedList.length - 2000);\n} else {\n  staticData.seenIds = updatedList;\n}\n\nreturn newItems;"
+      },
+      "id": "code-deduplicate",
+      "name": "Deduplicate Seen Postings",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1420, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nif (!items.length) return [];\n\nconst rows = items.map(item => {\n  const d = item.json;\n  return `• *[${d.source}]* <${d.applyLink}|${d.title}> at *${d.organization}* (${d.location}) - Match: \\`${d.matchedKeyword}\\``;\n});\n\nconst slackText = `🎯 *Found ${items.length} New Opportunities Matching Your Profile:*\\n\\n` + rows.join('\\n');\n\nreturn [{\n  json: {\n    count: items.length,\n    summaryMarkdown: slackText,\n    opportunities: items.map(i => i.json)\n  }\n}];"
+      },
+      "id": "code-format-digest",
+      "name": "Format Notification Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1640, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL || 'https://httpbin.org/post' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": $json.summaryMarkdown\n}",
+        "options": {}
+      },
+      "id": "http-slack-alert",
+      "name": "Dispatch Digest Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1880, 300],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Daily Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Kaggle Competitions",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Devpost Hackathons",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch HackerEarth Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Kaggle Competitions": {
+      "main": [
+        [
+          {
+            "node": "Normalize Kaggle Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Devpost Hackathons": {
+      "main": [
+        [
+          {
+            "node": "Normalize Devpost Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch HackerEarth Events": {
+      "main": [
+        [
+          {
+            "node": "Normalize HackerEarth Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Kaggle Items": {
+      "main": [
+        [
+          {
+            "node": "Merge Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Devpost Items": {
+      "main": [
+        [
+          {
+            "node": "Merge Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize HackerEarth Items": {
+      "main": [
+        [
+          {
+            "node": "Merge Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Sources": {
+      "main": [
+        [
+          {
+            "node": "Filter by Skills & Deadlines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter by Skills & Deadlines": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Seen Postings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate Seen Postings": {
+      "main": [
+        [
+          {
+            "node": "Format Notification Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Notification Digest": {
+      "main": [
+        [
+          {
+            "node": "Dispatch Digest Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

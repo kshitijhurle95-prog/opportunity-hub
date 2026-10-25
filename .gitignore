@@ -1,0 +1,59 @@
+# Dependency & Build Artifacts
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+ENV/
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.cert
+*.pfx
+
+# Local Database & Storage
+*.sqlite3
+*.db
+*.sqlite
+
+# Application Runtime Cache & Local User State
+config/.cache_seen_ids.json
+config/opportunities_cache.json
+config/applications_history.json
+config/saved_opportunities.json
+config/last_digest.json
+
+# Logs & Temporary Files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tmp
+*.temp
+
+# OS & Editor Artifacts
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Antigravity Local State
+.gemini/

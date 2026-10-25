@@ -1,0 +1,67 @@
+﻿{
+    "applicant":  {
+                      "fullName":  "Kshitij Hurle",
+                      "subtitle":  "2nd Year CSE (Data Science)",
+                      "email":  "kshitij.hurle@example.com",
+                      "phone":  "+91 98765 43210",
+                      "location":  "Pune, India",
+                      "workAuth":  "Eligible / Citizen",
+                      "university":  "Pune Institute of Computer Technology",
+                      "degree":  "B.Tech in Computer Science (Data Science)",
+                      "gradYear":  "2026",
+                      "gpa":  "8.9 / 10.0",
+                      "coursework":  "Data Structures, Algorithms, OS, DBMS, Deep Learning",
+                      "linkedIn":  "https://linkedin.com/in/kshitijhurle",
+                      "github":  "https://github.com/kshitijhurle",
+                      "portfolio":  "https://kshitijhurle.dev",
+                      "leetcode":  "https://leetcode.com/u/kshitijhurle",
+                      "resumePath":  "C:\\Users\\HP\\Documents\\Resume_Kshitij_Hurle.pdf",
+                      "avatar":  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format\u0026fit=crop\u0026w=256\u0026q=80",
+                      "summary":  "2nd Year Computer Science \u0026 Data Science student passionate about machine learning, backend engineering, and autonomous AI systems. Built scalable full-stack applications and hackathon winners.",
+                      "availability":  "Immediate (Summer 2026)",
+                      "workMode":  "Remote / Hybrid",
+                      "expectedStipend":  "?50,000 / month"
+                  },
+    "preferences":  {
+                        "roles":  [
+                                      "Software Engineer Intern",
+                                      "Machine Learning Intern",
+                                      "Data Science Intern",
+                                      "AI Researcher",
+                                      "Full Stack Developer Intern"
+                                  ],
+                        "skills":  [
+                                       "Python",
+                                       "React",
+                                       "APIs",
+                                       "System Design",
+                                       "AI/ML",
+                                       "Generative AI",
+                                       "Data Analysis",
+                                       "SQL",
+                                       "Machine Learning",
+                                       "TypeScript",
+                                       "Node.js",
+                                       "Docker"
+                                   ],
+                        "opportunityTypes":  [
+                                                 "Internships",
+                                                 "Hackathons",
+                                                 "Competitions",
+                                                 "Freelance Projects"
+                                             ],
+                        "domain":  "Full Stack \u0026 AI Systems",
+                        "locations":  [
+                                          "Remote",
+                                          "India",
+                                          "United States"
+                                      ],
+                        "minDaysRemaining":  1,
+                        "maxApplicationsPerDay":  10,
+                        "requireManualConfirmation":  true
+                    },
+    "notifications":  {
+                          "channel":  "email",
+                          "emailRecipient":  "kshitij.hurle@example.com"
+                      }
+}

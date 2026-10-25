@@ -1,0 +1,48 @@
+{
+  "applicant": {
+    "fullName": "Jane Doe",
+    "email": "jane.doe@example.com",
+    "phone": "+1-555-0199",
+    "linkedIn": "https://linkedin.com/in/janedoe",
+    "github": "https://github.com/janedoe",
+    "portfolio": "https://janedoe.dev",
+    "resumePath": "/data/resumes/resume_janedoe.pdf"
+  },
+  "preferences": {
+    "roles": [
+      "Software Engineer Intern",
+      "Machine Learning Intern",
+      "Data Science Intern",
+      "Backend Developer Intern",
+      "AI Researcher"
+    ],
+    "skills": [
+      "Python",
+      "PyTorch",
+      "TensorFlow",
+      "Machine Learning",
+      "AI",
+      "Hackathon",
+      "JavaScript",
+      "TypeScript",
+      "Node.js",
+      "Docker",
+      "SQL",
+      "FastAPI"
+    ],
+    "locations": [
+      "Remote",
+      "United States",
+      "India"
+    ],
+    "minDaysRemaining": 1,
+    "maxApplicationsPerDay": 10,
+    "requireManualConfirmation": true
+  },
+  "notifications": {
+    "channel": "slack",
+    "slackWebhookUrl": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+    "discordWebhookUrl": "",
+    "emailRecipient": "jane.doe@example.com"
+  }
+}
