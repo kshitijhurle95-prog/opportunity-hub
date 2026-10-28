@@ -1007,7 +1007,6 @@ async function clearHistory() {
   renderApplicationsTable();
   showToast('Application history cleared.');
 }
-}
 
 function clearAllFilters() {
   currentCategory = 'all';
