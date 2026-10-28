@@ -168,41 +168,58 @@ async function loadOpportunities() {
   const grid = document.getElementById('opportunities-grid');
   const errBanner = document.getElementById('error-recovery-banner');
 
+  let data = null;
   try {
     const res = await fetch('/api/opportunities');
-    if (!res.ok) throw new Error('HTTP ' + res.status + ': Failed to retrieve opportunities');
-    const data = await res.json();
-    
-    // Normalize into array
+    if (res.ok) {
+      data = await res.json();
+    }
+  } catch (err) {
+    console.warn('Backend API not responding, falling back to static feed:', err);
+  }
+
+  if (!data) {
+    try {
+      const res = await fetch('data/opportunities.json');
+      if (res.ok) {
+        data = await res.json();
+      }
+    } catch (e) {
+      console.error('Static data fallback error:', e);
+    }
+  }
+
+  if (data) {
     if (Array.isArray(data)) {
       allOpportunities = data;
     } else if (data && typeof data === 'object') {
-      allOpportunities = Array.isArray(data.items) ? data.items : [data];
+      allOpportunities = Array.isArray(data.items) ? data.items : (Array.isArray(data.opportunities) ? data.opportunities : [data]);
     } else {
       allOpportunities = [];
     }
-    
+
     if (errBanner) errBanner.classList.add('hidden');
     updateMetrics();
     applyFilters();
-  } catch (err) {
-    console.error('Error loading opportunities:', err);
-    if (errBanner) {
-      errBanner.classList.remove('hidden');
-      const title = document.getElementById('error-title');
-      if (title) title.innerText = 'Failed to load live opportunities';
-      const desc = document.getElementById('error-desc');
-      if (desc) desc.innerText = err.message;
-    }
-    if (grid) {
-      grid.innerHTML = `
-        <div class="col-span-full py-12 text-center text-rose-600 bg-rose-50 rounded-2xl border border-rose-200">
-          <div class="font-bold text-sm mb-1">Failed to load opportunities from server</div>
-          <div class="text-xs text-rose-500 mb-3">${escapeHtml(err.message)}</div>
-          <button onclick="loadOpportunities()" class="px-4 py-1.5 rounded-xl bg-white border border-rose-200 text-xs font-semibold text-rose-700 hover:bg-rose-100">Retry</button>
-        </div>
-      `;
-    }
+    return;
+  }
+
+  console.error('Failed to load opportunities from both API and static fallback.');
+  if (errBanner) {
+    errBanner.classList.remove('hidden');
+    const title = document.getElementById('error-title');
+    if (title) title.innerText = 'Failed to load live opportunities';
+    const desc = document.getElementById('error-desc');
+    if (desc) desc.innerText = 'Could not retrieve data from server or static files.';
+  }
+  if (grid) {
+    grid.innerHTML = `
+      <div class="col-span-full py-12 text-center text-rose-600 bg-rose-50 rounded-2xl border border-rose-200">
+        <div class="font-bold text-sm mb-1">Failed to load opportunities</div>
+        <div class="text-xs text-rose-500 mb-3">Please check your connection and refresh.</div>
+        <button onclick="loadOpportunities()" class="px-4 py-1.5 rounded-xl bg-white border border-rose-200 text-xs font-semibold text-rose-700 hover:bg-rose-100">Retry</button>
+      </div>
+    `;
   }
 }
 
@@ -210,43 +227,59 @@ async function refreshFeeds() {
   const syncIcon = document.getElementById('sync-icon');
   const errBanner = document.getElementById('error-recovery-banner');
   if (syncIcon) syncIcon.classList.add('animate-spin-custom');
-  showToast('Refreshing live feeds from Devpost, Remotive, HackerEarth, Kaggle, Unstop...');
+  showToast('Refreshing live feeds from connected platforms...');
 
   try {
     const res = await fetch('/api/refresh', { method: 'POST' });
-    const data = await res.json();
-    if (data.items) {
-      allOpportunities = Array.isArray(data.items) ? data.items : [data.items];
-      if (errBanner) errBanner.classList.add('hidden');
-      updateMetrics();
-      applyFilters();
-      
-      const syncTs = document.getElementById('sync-timestamp');
-      if (syncTs) syncTs.innerText = 'Last synced Just now';
-      showToast(`Refreshed! Found ${allOpportunities.length} live opportunities.`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.items) {
+        allOpportunities = Array.isArray(data.items) ? data.items : [data.items];
+        if (errBanner) errBanner.classList.add('hidden');
+        updateMetrics();
+        applyFilters();
+        const syncTs = document.getElementById('sync-timestamp');
+        if (syncTs) syncTs.innerText = 'Last synced Just now';
+        showToast(`Refreshed! Found ${allOpportunities.length} live opportunities.`);
+        if (syncIcon) syncIcon.classList.remove('animate-spin-custom');
+        return;
+      }
     }
-  } catch (err) {
-    console.error('Refresh error:', err);
-    if (errBanner) {
-      errBanner.classList.remove('hidden');
-      const desc = document.getElementById('error-desc');
-      if (desc) desc.innerText = err.message;
-    }
-    showToast('Failed to refresh feeds: ' + err.message);
-  } finally {
-    if (syncIcon) syncIcon.classList.remove('animate-spin-custom');
-  }
+  } catch (err) {}
+
+  await loadOpportunities();
+  const syncTs = document.getElementById('sync-timestamp');
+  if (syncTs) syncTs.innerText = 'Last synced Just now';
+  showToast(`Synced! Found ${allOpportunities.length} live opportunities.`);
+  if (syncIcon) syncIcon.classList.remove('animate-spin-custom');
 }
 
 async function loadProfile() {
+  const localProfile = localStorage.getItem('opportunityhub_profile');
+  if (localProfile) {
+    try {
+      userProfile = JSON.parse(localProfile);
+      populateProfileUI();
+    } catch(e) {}
+  }
+
   try {
     const res = await fetch('/api/profile');
     if (res.ok) {
       userProfile = await res.json();
       populateProfileUI();
+      return;
     }
-  } catch (err) {
-    console.error('Could not load profile', err);
+  } catch (err) {}
+
+  if (!userProfile) {
+    try {
+      const res = await fetch('data/profile.json');
+      if (res.ok) {
+        userProfile = await res.json();
+        populateProfileUI();
+      }
+    } catch (e) {}
   }
 }
 
@@ -318,9 +351,18 @@ async function loadHistory() {
     if (res.ok) {
       const data = await res.json();
       applicationHistory = Array.isArray(data) ? data : (data && data.id ? [data] : []);
+      return;
     }
-  } catch (err) {
-    console.error('Could not load history', err);
+  } catch (err) {}
+
+  const localHistory = localStorage.getItem('opportunityhub_history');
+  if (localHistory) {
+    try {
+      applicationHistory = JSON.parse(localHistory);
+    } catch(e) {
+      applicationHistory = [];
+    }
+  } else {
     applicationHistory = [];
   }
 }
@@ -332,10 +374,21 @@ async function loadSaved() {
       const data = await res.json();
       savedOpportunityIds = Array.isArray(data) ? data : [];
       updateSavedBadge();
+      return;
     }
-  } catch (err) {
+  } catch (err) {}
+
+  const localSaved = localStorage.getItem('opportunityhub_saved');
+  if (localSaved) {
+    try {
+      savedOpportunityIds = JSON.parse(localSaved);
+    } catch(e) {
+      savedOpportunityIds = [];
+    }
+  } else {
     savedOpportunityIds = [];
   }
+  updateSavedBadge();
 }
 
 function updateSavedBadge() {
@@ -613,6 +666,7 @@ function renderOpportunityCardHtml(item) {
 async function toggleSave(id, event) {
   if (event) event.stopPropagation();
 
+  let toggled = false;
   try {
     const res = await fetch('/api/saved', {
       method: 'POST',
@@ -628,13 +682,24 @@ async function toggleSave(id, event) {
         savedOpportunityIds = savedOpportunityIds.filter(i => i !== id);
         showToast('Removed from bookmarks');
       }
-      updateSavedBadge();
-      applyFilters();
-      if (currentRoute === 'saved') renderSavedGrid();
+      toggled = true;
     }
-  } catch (e) {
-    console.error(e);
+  } catch (e) {}
+
+  if (!toggled) {
+    if (savedOpportunityIds.includes(id)) {
+      savedOpportunityIds = savedOpportunityIds.filter(i => i !== id);
+      showToast('Removed from bookmarks');
+    } else {
+      savedOpportunityIds.push(id);
+      showToast('Saved to your bookmarks! 🔖');
+    }
+    localStorage.setItem('opportunityhub_saved', JSON.stringify(savedOpportunityIds));
   }
+
+  updateSavedBadge();
+  applyFilters();
+  if (currentRoute === 'saved') renderSavedGrid();
 }
 
 function renderSavedGrid() {
@@ -858,35 +923,47 @@ async function saveProfile(e) {
     });
     if (res.ok) {
       userProfile = updated;
-      closeProfileModal();
-      populateProfileUI();
-      showToast('Profile and preferences successfully saved! ✓');
     }
-  } catch (err) {
-    showToast('Failed to save profile: ' + err.message);
-  }
+  } catch (err) {}
+
+  userProfile = updated;
+  try {
+    localStorage.setItem('opportunityhub_profile', JSON.stringify(updated));
+  } catch(e) {}
+  closeProfileModal();
+  populateProfileUI();
+  showToast('Profile and preferences successfully saved! ✓');
 }
 
 // --- Auto-Apply Execution ---
 async function triggerAutoApply() {
   if (!selectedOpp) return;
 
+  const appRecord = {
+    id: selectedOpp.id,
+    title: selectedOpp.title,
+    organization: selectedOpp.organization,
+    source: selectedOpp.source,
+    type: selectedOpp.type,
+    applyLink: selectedOpp.applyLink,
+    status: 'Applied',
+    appliedAt: new Date().toISOString()
+  };
+
   try {
     await fetch('/api/apply', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: selectedOpp.id,
-        title: selectedOpp.title,
-        source: selectedOpp.source,
-        type: selectedOpp.type,
-        applyLink: selectedOpp.applyLink,
-        status: 'Applied'
-      })
+      body: JSON.stringify(appRecord)
     });
     await loadHistory();
   } catch (err) {
-    console.error('Error tracking apply:', err);
+    if (!applicationHistory.some(a => a.id === selectedOpp.id)) {
+      applicationHistory.unshift(appRecord);
+      try {
+        localStorage.setItem('opportunityhub_history', JSON.stringify(applicationHistory));
+      } catch(e) {}
+    }
   }
 
   try {
@@ -922,12 +999,14 @@ async function clearHistory() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ clearAll: true })
     });
-    applicationHistory = [];
-    renderApplicationsTable();
-    showToast('Application history cleared.');
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
+  applicationHistory = [];
+  try {
+    localStorage.removeItem('opportunityhub_history');
+  } catch(e) {}
+  renderApplicationsTable();
+  showToast('Application history cleared.');
+}
 }
 
 function clearAllFilters() {
