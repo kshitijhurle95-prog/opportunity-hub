@@ -9,12 +9,13 @@
 ---
 
 [![GitHub release](https://img.shields.io/badge/release-v2.4.0-4f46e5?style=for-the-badge&logo=github)](https://github.com/kshitijhurle95-prog/opportunity-hub)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-kshitijhurle95--prog.github.io%2Fopportunity--hub-success?style=for-the-badge&logo=googlechrome&logoColor=white)](https://kshitijhurle95-prog.github.io/opportunity-hub/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
 [![Platform: Cross-Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-3b82f6?style=for-the-badge)](https://github.com/kshitijhurle95-prog/opportunity-hub)
 [![Status: Active Production](https://img.shields.io/badge/Status-Active%20Production-8b5cf6?style=for-the-badge)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-f59e0b?style=for-the-badge)](CONTRIBUTING.md)
 
-[Explore Features](#-key-features) • [Visual Showcase](#-visual-showcase) • [Architecture](#-system-architecture) • [Supported Platforms](#-supported-platforms-12-sources) • [Quickstart](#-quickstart--local-setup)
+[🚀 **Open Live Website**](https://kshitijhurle95-prog.github.io/opportunity-hub/) • [Explore Features](#-key-features) • [Visual Showcase](#-visual-showcase) • [Architecture](#-system-architecture) • [Supported Platforms](#-supported-platforms-12-sources) • [Quickstart](#-quickstart--local-setup)
 
 ---
 
